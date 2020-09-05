@@ -1,6 +1,6 @@
 import requests
 
-from backend import keyvalue
+from backend import keyvalue, environment
 
 class NotEnougthMovies(Exception):
     def __init__(self, message="There is not enougth movies for given search key"):
@@ -27,7 +27,7 @@ class MovieDBInitialization():
     @classmethod
     def request_movies(cls, search, page):
         URL = 'http://www.omdbapi.com/'
-        PARAMS = {'apikey':'74fd942e', 's':search, "page":page}
+        PARAMS = {'apikey':environment.OMDB_KEY, 's':search, "page":page}
         try:
             response = requests.get(url = URL, params = PARAMS) 
             response.raise_for_status()
