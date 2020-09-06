@@ -30,7 +30,7 @@ class MovieIDRequest(messages.Message):
 class Movies(remote.Service):
     @remote.method(TitleRequest, MovieResponse)
     def search(self, request):
-        movie = movies.searchDB(request.title)
+        movie = movies.search(request.title)
         if movie is not None:
             return MovieResponse(
                 title = movie.title,

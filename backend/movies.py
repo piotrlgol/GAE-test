@@ -110,7 +110,7 @@ def initializeDB(search_key="space", movies_to_find=100):
     initialized = Movie.initialize(search_key, movies_to_find)
     return initialized
 
-def searchDB(title):
+def search(title):
     return Movie.get_by_title(title)
 
 def list_movies(page, items_per_page):
