@@ -52,11 +52,6 @@ class Movies(remote.Service):
         movies.add(request.title)
         return message_types.VoidMessage()
 
-    @remote.method(message_types.VoidMessage, message_types.VoidMessage)
-    def init(self, request):
-        movies.initializeDB()
-        return message_types.VoidMessage()
-
     @oauth2.required()
     @remote.method(MovieIDRequest, message_types.VoidMessage)
     def delete(self, request):
