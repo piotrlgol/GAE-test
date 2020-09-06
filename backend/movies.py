@@ -117,4 +117,5 @@ def add(title):
     Movie.create(title)
 
 def delete(id):
-    pass
+    entity = Movie.get(id)
+    entity.key.delete()

@@ -23,7 +23,7 @@ class MoviePageResponse(messages.Message):
     movies = messages.StringField(1)
 
 class MovieIDRequest(messages.Message):
-    id= messages.IntegerField(1)
+    id= messages.StringField(1)
 
 
 @api.endpoint(path="movies", title="Movies API")
