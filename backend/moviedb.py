@@ -38,3 +38,15 @@ class MovieDBInitialization():
 
 def initializeDB(search_key="space", movies_to_find=100):
     MovieDBInitialization.insertmovies(search_key, movies_to_find)
+
+def searchDB():
+    pass
+
+def list_movies():
+    pass
+
+def add():
+    pass
+
+def delete():
+    pass

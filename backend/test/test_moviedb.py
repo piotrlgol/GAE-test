@@ -1,5 +1,5 @@
 from backend import test
-from backend import moviedbinitialization
+from backend import moviedb
 from backend import keyvalue
 
 class TestMovieDBInitialization(test.TestCase):
