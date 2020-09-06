@@ -1,23 +1,64 @@
-from protorpc import remote, messages
+import json
 
-from backend import api, moviedb
+from protorpc import remote, messages, message_types
+
+from backend import api, movies
 from backend.oauth2 import oauth2, Oauth2
 
-@api.endpoint(path="moviedb", title="MovieDB API")
+class TitleRequest(messages.Message):
+    title = messages.StringField(1)
+
+class MovieResponse(messages.Message):
+    title = messages.StringField(1)
+    Year = messages.StringField(2)
+    imdbID = messages.StringField(3)
+    Type = messages.StringField(4)
+    Poster = messages.StringField(5)
+
+class MoviePageRequest(messages.Message):
+    page = messages.IntegerField(1)
+    items_per_page = messages.IntegerField(2)
+
+class MoviePageResponse(messages.Message):
+    results = messages.BytesField(1)
+
+class MovieIDRequest(messages.Message):
+    id= messages.IntegerField(1)
+
+
+@api.endpoint(path="movies", title="Movies API")
 class Movies(remote.Service):
-    @remote.method(message_types.VoidMessage, message_types.VoidMessage)
+    @remote.method(TitleRequest, MovieResponse)
     def search(self, request):
-        pass
+        movie = movies.searchDB(request.title)
+        if movie is not None:
+            return MovieResponse(
+                title = movie.title,
+                Year = movie.year,
+                imdbID = movie.imdbID,
+                Type = movie.type_,
+                Poster = movie.poster
+                )
+        else:
+            return MovieResponse()
 
-    @remote.method(message_types.VoidMessage, message_types.VoidMessage)
+    @remote.method(MoviePageRequest, MoviePageResponse)
     def movies(self, request):
-        pass
+        movies_page = movies.movies(request.page, request.items_per_page)
+        return MoviePageResponse(results=json.dumps(movies_page, ensure_ascii=True))
+
+    @remote.method(TitleRequest, message_types.VoidMessage)
+    def add(self, request):
+        movies.add(request.title)
+        return message_types.VoidMessage()
 
     @remote.method(message_types.VoidMessage, message_types.VoidMessage)
-    def add(self, request):
-        pass
+    def init(self, request):
+        movies.initializeDB()
+        return message_types.VoidMessage()
 
     @oauth2.required()
-    @remote.method(message_types.VoidMessage, message_types.VoidMessage)
+    @remote.method(MovieIDRequest, message_types.VoidMessage)
     def delete(self, request):
-        pass
+        movies.delete(request.id)
+        return message_types.VoidMessage()
