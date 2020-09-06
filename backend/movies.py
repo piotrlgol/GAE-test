@@ -91,6 +91,11 @@ class Movie(ndb.Model):
         entities = cls.query(cls.title == title).fetch(1)
         return entities[0] if entities else None
 
+    @classmethod
+    def get_page(cls, page, items_per_page):
+        items_per_page = items_per_page if items_per_page else 10
+        return cls.query().order(cls.title).fetch(items_per_page, offset=items_per_page*(page-1))
+         
     @property
     def id(self):
         return self.key.urlsafe()
@@ -103,7 +108,10 @@ def searchDB(title):
     return Movie.get_by_title(title)
 
 def list_movies(page, items_per_page):
-    pass
+    page_list = []
+    for movie in Movie.get_page(page, items_per_page):
+        page_list.append(movie.to_dict())
+    return page_list
 
 def add(title):
     Movie.create(title)

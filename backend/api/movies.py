@@ -20,7 +20,7 @@ class MoviePageRequest(messages.Message):
     items_per_page = messages.IntegerField(2)
 
 class MoviePageResponse(messages.Message):
-    results = messages.BytesField(1)
+    movies = messages.StringField(1)
 
 class MovieIDRequest(messages.Message):
     id= messages.IntegerField(1)
@@ -44,8 +44,8 @@ class Movies(remote.Service):
 
     @remote.method(MoviePageRequest, MoviePageResponse)
     def movies(self, request):
-        movies_page = movies.movies(request.page, request.items_per_page)
-        return MoviePageResponse(results=json.dumps(movies_page, ensure_ascii=True))
+        movies_page = movies.list_movies(request.page, request.items_per_page)
+        return MoviePageResponse(movies=json.dumps(movies_page, ensure_ascii=True))
 
     @remote.method(TitleRequest, message_types.VoidMessage)
     def add(self, request):
