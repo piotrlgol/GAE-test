@@ -13,6 +13,10 @@ class MoviesNotFound(error.Error):
 class OMDBNotResponding(error.Error):
     pass
 
+class NotFound(error.Error):
+    pass
+
+
 class Movie(ndb.Model):
     title = ndb.StringProperty(indexed=True)
     year = ndb.StringProperty(indexed=False)
@@ -35,22 +39,23 @@ class Movie(ndb.Model):
                 poster = movie.get('Poster')
             )
             entity.put()
-            cls.get.lru_set(entity, args=[cls, entity.id])
             entity_list.append(entity)
+            cls.get.lru_set(entity, args=[cls, entity.id])
             if(stop_condition(stop_arg1, stop_arg2)):
                 break
         return entity_list
 
     @classmethod
     def initialize(cls, search_key, movies_to_find):
-        if(len(Movie.query().fetch()) != 0):
-            return
-        page = 1
         found = 0
+        if(len(Movie.query().fetch()) != 0):
+            return 0
+        page = 1
         while found < movies_to_find:
             entity_list = cls.create(search_key, page, found, movies_to_find, cls.all_movies_found)
-            found += len(entity_list)
             page += 1
+            found += len(entity_list)
+        return found
 
     @staticmethod
     def all_movies_found(found, required):
@@ -62,7 +67,7 @@ class Movie(ndb.Model):
     @classmethod
     def search_movies(cls, search, page):
         URL = 'http://www.omdbapi.com/'
-        PARAMS = {'apikey':environment.OMDB_KEY, 's':search, "page":page}
+        PARAMS = {'apikey':environment.OMDB_KEY, 's':search, "page":page, 'type':'movie'}
         data = urllib.urlencode(PARAMS)
         data = data.encode('ascii')
         full_url = URL + '?' + data
@@ -102,7 +107,8 @@ class Movie(ndb.Model):
 
 
 def initializeDB(search_key="space", movies_to_find=100):
-    Movie.initialize(search_key, movies_to_find)
+    initialized = Movie.initialize(search_key, movies_to_find)
+    return initialized
 
 def searchDB(title):
     return Movie.get_by_title(title)
@@ -119,3 +125,5 @@ def add(title):
 def delete(id):
     entity = Movie.get(id)
     entity.key.delete()
+
+

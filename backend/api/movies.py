@@ -3,7 +3,7 @@ import json
 from protorpc import remote, messages, message_types
 
 from backend import api, movies
-from backend.oauth2 import oauth2, Oauth2
+from backend.oauth2 import oauth2
 
 class TitleRequest(messages.Message):
     title = messages.StringField(1)
