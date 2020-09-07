@@ -31,19 +31,25 @@ class Movie(ndb.Model):
         if(request['Response'] == 'False'):
             raise MoviesNotFound()
         for movie in request.get('Search'):
-            entity = cls(
+            entity = cls.get_or_insert(ndb.Key(cls, movie.get('Title')).id())
+            entity.update(
                 title = movie.get('Title'),
                 year = movie.get('Year'),
                 imdbID = movie.get('imdbID'),
                 type_ = movie.get('Type'),
                 poster = movie.get('Poster')
             )
-            entity.put()
             entity_list.append(entity)
             cls.get.lru_set(entity, args=[cls, entity.id])
             if(stop_condition(stop_arg1, stop_arg2)):
                 break
         return entity_list
+
+    def update(self, **kwargs):
+        updates = [setattr(self, key, value) for key, value in kwargs.iteritems() if getattr(self, key) != value]
+        if len(updates) > 0:
+            self.put()
+        return self
 
     @classmethod
     def initialize(cls, search_key, movies_to_find):
@@ -107,8 +113,7 @@ class Movie(ndb.Model):
 
 
 def initializeDB(search_key="space", movies_to_find=100):
-    initialized = Movie.initialize(search_key, movies_to_find)
-    return initialized
+    return Movie.initialize(search_key, movies_to_find)
 
 def search(title):
     return Movie.get_by_title(title)
@@ -120,10 +125,10 @@ def list_movies(page, items_per_page):
     return page_list
 
 def add(title):
-    Movie.create(title)
+    return Movie.create(title)
 
 def delete(id):
-    entity = Movie.get(id)
-    entity.key.delete()
+    entity_key = ndb.Key(urlsafe=id)
+    entity_key.delete()
 
 
