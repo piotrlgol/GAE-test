@@ -29,6 +29,11 @@ Good luck!
 - backend should be running
 - `localhost:7000` as default
 
+## Task solutions preview
+
+- To run movie API provide your OMDB_key in the enviroment.py
+- Three files were created: /backend/movies.py , /api/movies.py , /test/test_movies.py
+
 ## Technologies used
 
 - Python 2.7
